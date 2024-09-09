@@ -144,3 +144,4 @@ const dibujarGrafo = (svg, node, x, y, dx, dy) => {
         dibujarGrafo(svg, node.right, x + dx, y + dy, dx / 2, dy);
     }
 };
+//hola
