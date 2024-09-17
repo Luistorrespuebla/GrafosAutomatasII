@@ -17,6 +17,7 @@ const generarGrafo = () => {
     const ast = operadorM(expression.trim());
     if (ast) {
         visualizarGrafo(ast);
+        mostrarRecorridos(ast); 
     } else {
         documentWriteMessage("Expresión no válida.");
     }
@@ -52,7 +53,6 @@ const operadorM = (expression) => {
         }
     }
 
-    
     if (operatorIndex === -1) {
         for (let i = 0; i < operators.length; i++) {
             operatorIndex = expression.lastIndexOf(operators[i]);
@@ -79,7 +79,7 @@ const operadorM = (expression) => {
     return {
         type: 'BinaryExpression',
         operator: operator,
-        left: operadorM(cleanedLeft),  
+        left: operadorM(cleanedLeft),
         right: operadorM(cleanedRight)
     };
 };
@@ -90,7 +90,7 @@ const visualizarGrafo = (ast) => {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("width", "600");
-    svg.setAttribute("height", "400");
+    svg.setAttribute("height", "700");
 
     dibujarGrafo(svg, ast, 300, 50, 150, 100);
 
@@ -105,7 +105,7 @@ const dibujarGrafo = (svg, node, x, y, dx, dy) => {
     const circle = document.createElementNS(svgNS, "circle");
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
-    circle.setAttribute("r", 30);
+    circle.setAttribute("r", 29);
     circle.setAttribute("fill", "#28a745");
     svg.appendChild(circle);
 
@@ -144,4 +144,37 @@ const dibujarGrafo = (svg, node, x, y, dx, dy) => {
         dibujarGrafo(svg, node.right, x + dx, y + dy, dx / 2, dy);
     }
 };
-//hola
+
+const recorridoInOrden = (node) => {
+    if (!node) return '';
+    const left = recorridoInOrden(node.left);
+    const right = recorridoInOrden(node.right);
+    const value = (node.operator || node.value).replace(/[()]/g, ''); 
+    return `${left} ${value} ${right}`.trim();
+};
+
+const recorridoPreOrden = (node) => {
+    if (!node) return '';
+    const value = (node.operator || node.value).replace(/[()]/g, ''); 
+    const left = recorridoPreOrden(node.left);
+    const right = recorridoPreOrden(node.right);
+    return `${value} ${left} ${right}`.trim();
+};
+
+const recorridoPostOrden = (node) => {
+    if (!node) return '';
+    const left = recorridoPostOrden(node.left);
+    const right = recorridoPostOrden(node.right);
+    const value = (node.operator || node.value).replace(/[()]/g, ''); 
+    return `${left} ${right} ${value}`.trim();
+};
+
+const mostrarRecorridos = (ast) => {
+    const resultados = document.getElementById("recorridos");
+    const inOrden = recorridoInOrden(ast);
+    const preOrden = recorridoPreOrden(ast);
+    const postOrden = recorridoPostOrden(ast);
+
+    resultados.value = `InOrden: ${inOrden}\nPreOrden: ${preOrden}\nPostOrden: ${postOrden}`;
+};
+//link
